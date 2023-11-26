@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 import time
 
 #import custom activation functions
-import custom_act_funcs
+from custom_act_funcs import *
 
 act_funcs_list = [custom_act_funcs.NegReLU()]
 act_funcs_dict = {'ReLU' : nn.ReLU(),
