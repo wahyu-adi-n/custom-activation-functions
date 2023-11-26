@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 import time
 
 #import custom activation functions
-from custom_act_funcs import *
+import custom_act_funcs
 
 act_funcs_list = [custom_act_funcs.NegReLU()]
 act_funcs_dict = {'ReLU' : nn.ReLU(),
@@ -30,18 +30,18 @@ act_funcs_dict = {'ReLU' : nn.ReLU(),
                     #'SmallNeg_0.3' : custom_act_funcs.Small_Neg(0.3),
                     #'SmallNeg_0.4' : custom_act_funcs.Small_Neg(0.4),
                     'SmallNeg_0.5' : custom_act_funcs.Small_Neg(0.5),
-                    'Pos_Hill_V2' : Pos_Hill_V2((-1,0), (0,1), (1,0)),
-                    'Pos_Hill_V2_s' : Pos_Hill_V2((-0.5,0),(0,1.25),(0.5,0)),
-                    'Pos_Hill_V2_xs' : Pos_Hill_V2((-0.25,0),(0,0.75),(0.25,0)),
-                    'Pos_Hill_V3' : Pos_Hill_V3((-1,0), (0,1), (1,0)),
-                    'Pos_Hill_V3_s' : Pos_Hill_V3((-0.5,0), (0,1.25), (0.5,0)),
-                    'Pos_Hill_V3_xs' : Pos_Hill_V3((-0.25,0), (0,0.75), (0.25,0)),
-                    'Double_Hill' : Double_Hill((-2,0), (-1,1), (0,0), (1,1), (2,0)),
-                    'Double_Hill_s' : Double_Hill((-1,0), (-0.5,1), (0,0), (0.5,1), (1,0)),
-                    'Double_Hill_xs' : Double_Hill((-0.75,0), (-0.4,0.9), (0,0), (0.4,0.9), (0.75,0)),
-                    'Val_Hill' : Val_Hill((-2,0), (-1,-1), (1,1), (2,0)),
-                    'Val_Hill_s' : Val_Hill((-1,0), (-0.5,-0.9), (0.5,0.9), (1,0)),
-                    'Val_Hill_xs' : Val_Hill((-0.75,0), (-0.25,-0.75), (0.25,0.75), (0.75,0))
+                    'Pos_Hill_V2' : custom_act_funcs.Pos_Hill_V2((-1,0), (0,1), (1,0)),
+                    'Pos_Hill_V2_s' : custom_act_funcs.Pos_Hill_V2((-0.5,0),(0,1.25),(0.5,0)),
+                    'Pos_Hill_V2_xs' : custom_act_funcs.Pos_Hill_V2((-0.25,0),(0,0.75),(0.25,0)),
+                    'Pos_Hill_V3' : custom_act_funcs.Pos_Hill_V3((-1,0), (0,1), (1,0)),
+                    'Pos_Hill_V3_s' : custom_act_funcs.Pos_Hill_V3((-0.5,0), (0,1.25), (0.5,0)),
+                    'Pos_Hill_V3_xs' : custom_act_funcs.Pos_Hill_V3((-0.25,0), (0,0.75), (0.25,0)),
+                    'Double_Hill' : custom_act_funcs.Double_Hill((-2,0), (-1,1), (0,0), (1,1), (2,0)),
+                    'Double_Hill_s' : custom_act_funcs.Double_Hill((-1,0), (-0.5,1), (0,0), (0.5,1), (1,0)),
+                    'Double_Hill_xs' : custom_act_funcs.Double_Hill((-0.75,0), (-0.4,0.9), (0,0), (0.4,0.9), (0.75,0)),
+                    'Val_Hill' : custom_act_funcs.Val_Hill((-2,0), (-1,-1), (1,1), (2,0)),
+                    'Val_Hill_s' : custom_act_funcs.Val_Hill((-1,0), (-0.5,-0.9), (0.5,0.9), (1,0)),
+                    'Val_Hill_xs' : custom_act_funcs.Val_Hill((-0.75,0), (-0.25,-0.75), (0.25,0.75), (0.75,0))
 
     }
 
