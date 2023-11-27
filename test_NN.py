@@ -67,6 +67,7 @@ val_data = datasets.ImageFolder('chest_xray/val', transform = test_data_transfor
 test_data = datasets.ImageFolder('chest_xray/test', transform = test_data_transform)
 
 batch_size = 32
+epochs = 3
 
 # Create data loaders.
 train_loader = torch.utils.data.DataLoader(train_data,
@@ -82,8 +83,6 @@ test_loader   = torch.utils.data.DataLoader(test_data,
 # Class-number association
 class_index = {0: 'NORMAL', 1: 'PNEUMONIA'}
 # show_samples(train_loader, 2, class_index)
-
-
 
 for X, y in test_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
@@ -278,7 +277,7 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
             # #Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.1)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
 
             train_accuracy_list =[]
             test_accuracy_list =[]
@@ -287,7 +286,6 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
 
 
             #training and testing the network
-            epochs = 1
             for t in range(epochs):
                 loop_start_time = time.perf_counter()
                 print(f"Epoch {t+1}\n-------------------------------")
