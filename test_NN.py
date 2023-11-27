@@ -66,7 +66,7 @@ train_data = datasets.ImageFolder('chest_xray/train', transform = train_data_tra
 val_data = datasets.ImageFolder('chest_xray/val', transform = test_data_transform)
 test_data = datasets.ImageFolder('chest_xray/test', transform = test_data_transform)
 
-batch_size = 32
+batch_size = 64
 
 # Create data loaders.
 train_loader = torch.utils.data.DataLoader(train_data,
