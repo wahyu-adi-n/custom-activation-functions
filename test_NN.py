@@ -67,7 +67,6 @@ val_data = datasets.ImageFolder('chest_xray/val', transform = test_data_transfor
 test_data = datasets.ImageFolder('chest_xray/test', transform = test_data_transform)
 
 batch_size = 32
-epochs = 3
 
 # Create data loaders.
 train_loader = torch.utils.data.DataLoader(train_data,
@@ -99,8 +98,6 @@ def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     model.train()
-    train_accuracy_list = []
-    train_loss_list = []
     train_loss, correct = 0, 0
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
@@ -129,8 +126,6 @@ def train(dataloader, model, loss_fn, optimizer):
 def evaluate(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    test_accuracy_list = []
-    test_loss_list = []
     model.eval()
     test_loss, correct = 0, 0
     with torch.no_grad():
@@ -162,7 +157,7 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
     for text, func in act_funcs_dict.items():
 
         #test each function 1 times in order to caluclate statistics
-        for i in range(1, 2):
+        for i in range(1, 6):
             print(func)
             # Define model
             model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
@@ -284,7 +279,7 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
             train_loss_list =[]
             test_loss_list =[]
 
-
+            epochs = 5
             #training and testing the network
             for t in range(epochs):
                 loop_start_time = time.perf_counter()
