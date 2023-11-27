@@ -157,7 +157,7 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
     for text, func in act_funcs_dict.items():
 
         #test each function 1 times in order to caluclate statistics
-        for i in range(1, 6):
+        for i in range(1, 2):
             print(func)
             # Define model
             model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
