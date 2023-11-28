@@ -30,5 +30,5 @@ afs_dict = {
             }
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-epochs = 5
+epochs = 2
 classes = ['normal', 'pneumonia']
