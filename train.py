@@ -133,8 +133,8 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             epoch = range(1, len(test_accuracy_list) +1)
 
             # Plottinf Model Accuracy Curve
-            plt.plot(epoch, train_accuracy_list, "b", label="train")
-            plt.plot(epoch, test_accuracy_list, "b", label="val")
+            plt.plot(epoch, train_accuracy_list, label="train")
+            plt.plot(epoch, test_accuracy_list, label="val")
             plt.title(f"{text} - DenseNet121 Model Accuracy {i}")
             plt.xlabel("epoch")
             plt.ylabel("accuracy")
@@ -144,8 +144,8 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             plt.clf()
 
             # Plotting Model Loss Curve
-            plt.plot(epoch, train_loss_list, "b", label="train")
-            plt.plot(epoch, test_loss_list, "b", label="val")
+            plt.plot(epoch, train_loss_list, label="train")
+            plt.plot(epoch, test_loss_list, label="val")
             plt.title(f"{text} - DenseNet121 Model Loss {i}")
             plt.xlabel("epoch")
             plt.ylabel("loss")
@@ -153,3 +153,5 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             plt.savefig(f"assets/loss_plots/{text}_DenseNet_121_Model_Loss_{i}.png")
             plt.figure()
             plt.clf()
+
+            plt.close()
