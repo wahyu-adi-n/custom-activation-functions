@@ -30,9 +30,9 @@ print(f"Using {device} device")
 model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
 model.to(device)
 
-model = NeuralNetwork().to(device)
-model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
-model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
+# model = NeuralNetwork().to(device)
+# model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
+# model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
 print(model)
 
 with open("densenet_121_results.csv", mode="w") as csv_file:
