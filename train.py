@@ -95,7 +95,7 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             # Replace afs in hidden layers
             replace_afs(module = model, func = func)  
 
-            print("After replace AFs:\n", model)
+            print("\nAfter replace AFs:\n", model)
 
             # Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
@@ -126,7 +126,7 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
 
             # Saving the model
             # save the model with afs in the name as well iteration
-            torch.save(model.state_dict(), f"{text}_{i}.pt")
+            torch.save(model.state_dict(), f"assets/weights/{text}_{i}.pt")
             print(f"Saved PyTorch Model State to {text}_{i}.pt\n")
 
             # Creating plot
