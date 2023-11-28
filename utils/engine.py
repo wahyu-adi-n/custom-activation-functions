@@ -1,12 +1,10 @@
 import torch 
 
-global train_accuracy_list
-global train_loss_list
-global test_accuracy_list
-global test_loss_list
-
 # Creating training loop
 def train(dataloader, model, loss_fn, optimizer, device):
+    global train_accuracy_list
+    global train_loss_list
+
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     model.train()
@@ -36,6 +34,9 @@ def train(dataloader, model, loss_fn, optimizer, device):
 
 # Creating testing loop
 def evaluate(dataloader, model, loss_fn, device):
+    global test_accuracy_list
+    global test_loss_list
+
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     model.eval()
