@@ -45,17 +45,17 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
         #test each function 1 times in order to caluclate statistics
         for i in range(1, 2):
             # Replace afs in hidden layers
-            replace_afs(module=model, func=func)  
+            replace_afs(module = model, func = func)  
 
             # Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
 
-            train_accuracy_list =[]
-            test_accuracy_list =[]
-            train_loss_list =[]
-            test_loss_list =[]
+            train_accuracy_list = []
+            test_accuracy_list = []
+            train_loss_list = []
+            test_loss_list = []
 
             # Training and testing the network
             for t in range(epochs):
