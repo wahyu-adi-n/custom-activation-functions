@@ -1,9 +1,8 @@
+from utils.data_preparation import data_loader_preparation
 import numpy as np
 import matplotlib.pyplot as plt
 
 def show_samples(train_loader, num_classes, class_index):
-    import numpy as np
-    import matplotlib.pyplot as plt
 
     plt.figure(figsize=(20, 10))
     n_rows = 2
@@ -31,4 +30,6 @@ def show_samples(train_loader, num_classes, class_index):
     plt.savefig("sample_images.jpg", format='jpg')
     plt.show()
     
-    
+if __name__ == '__main__':
+    train_loader, _, _ = data_loader_preparation()
+    show_samples(train_loader, 2, {0: 'NORMAL', 1: 'PNEUMONIA'})
