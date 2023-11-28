@@ -1,8 +1,7 @@
 from torch import nn
 from torchvision import models
 from config.config import afs_dict, device, epochs
-from utils.data_preparation import data_prep, load_data_loader_preparation
-from utils.engine import train, evaluate
+from utils.data_preparation import load_data_loader_preparation
 from utils.helper import replace_afs
 from model.small_nn import NeuralNetwork
 from model.resnet import ResidualBlock, ResNet
