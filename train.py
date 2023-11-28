@@ -68,20 +68,11 @@ for X, y in train_loader:
 
 # Creating the model
 # Get cpu or gpu device for training.
-print(f"Using {device} device")
+print(f"Device Type: {device} device.")
+print(f"Epochs: {epochs} epochs.")
+print()
 
-# Define model
-
-# Using pre-trained models
-model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
-model.to(device)
-
-# model = NeuralNetwork().to(device)
-# model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
-# model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
-print(model)
-
-with open("densenet_121_results.csv", mode="w") as csv_file:
+with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
     csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)"])
 
@@ -90,8 +81,21 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
 
         #test each function 1 times in order to caluclate statistics
         for i in range(1, 2):
+            # Define model
+            # Using pre-trained models
+            model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
+            model.to(device)
+
+            # model = NeuralNetwork().to(device)
+            # model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
+            # model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
+
+            print("Before:\n", model)
+
             # Replace afs in hidden layers
             replace_afs(module = model, func = func)  
+
+            print("After replace AFs:\n", model)
 
             # Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
@@ -122,31 +126,30 @@ with open("densenet_121_results.csv", mode="w") as csv_file:
 
             # Saving the model
             # save the model with afs in the name as well iteration
-            torch.save(model.state_dict(), f"{text}_{i}.pth")
-            print(f"Saved PyTorch Model State to {text}_{i}.pth")
+            torch.save(model.state_dict(), f"{text}_{i}.pt")
+            print(f"Saved PyTorch Model State to {text}_{i}.pt\n")
 
             # Creating plot
             epoch = range(1, len(test_accuracy_list) +1)
-                        
-            plt.plot(epoch, train_accuracy_list, "b", label="Train Accuracy")
-            # plt.plot(epoch, val_acc, "bo", label="Validation acc")
-            plt.title(f"{text} DenseNet121 Train_Accuracy {i}")
+
+            # Plottinf Model Accuracy Curve
+            plt.plot(epoch, train_accuracy_list, "b", label="train")
+            plt.plot(epoch, test_accuracy_list, "b", label="val")
+            plt.title(f"{text} - DenseNet121 Model Accuracy {i}")
+            plt.xlabel("epoch")
+            plt.ylabel("accuracy")
             plt.legend()
-            plt.savefig(f"assets/{text}_DenseNet_121_Train_Acc_{i}.png")
+            plt.savefig(f"assets/acc_plots/{text}_DenseNet_121_Model_Accuracy_{i}.png")
             plt.figure()
             plt.clf()
 
-            plt.plot(epoch, test_accuracy_list, "b", label="Val Accuracy")
-            # plt.plot(epoch, val_acc, "bo", label="Validation acc")
-            plt.title(f"{text} DenseNet121 Val Accuracy {i}")
+            # Plotting Model Loss Curve
+            plt.plot(epoch, train_loss_list, "b", label="train")
+            plt.plot(epoch, test_loss_list, "b", label="val")
+            plt.title(f"{text} - DenseNet121 Model Loss {i}")
+            plt.xlabel("epoch")
+            plt.ylabel("loss")
             plt.legend()
-            plt.savefig(f"assets/{text}_DenseNet_121_Val_Acc_{i}.png")   
+            plt.savefig(f"assets/loss_plots/{text}_DenseNet_121_Model_Loss_{i}.png")
+            plt.figure()
             plt.clf()
-
-        plt.figure()
-plt.plot(epoch, train_loss_list, "b", label="Train Loss")
-plt.plot(epoch, test_loss_list, "b", label="Val Loss")
-plt.title("Train and Val Loss")
-plt.legend()
-plt.savefig("assets/DenseNet_121_Train_Val_Loss.png")
-plt.show()
