@@ -100,7 +100,7 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
 
             # Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
-            optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
+            optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.0001)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
 
             train_accuracy_list = []
