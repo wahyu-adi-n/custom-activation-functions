@@ -4,3 +4,4 @@ __pycache__/
 chest_xray.zip
 *.pt
 *.pth
+assets/
