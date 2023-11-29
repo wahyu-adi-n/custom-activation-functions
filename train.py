@@ -142,7 +142,6 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             plt.savefig(f"assets/acc_plots/{text}_DenseNet_121_Model_Accuracy_{i}.png")
             plt.figure()
             plt.clf()
-            plt.close()
 
             # Plotting Model Loss Curve
             plt.plot(epoch, train_loss_list, label="train")
@@ -154,4 +153,3 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             plt.savefig(f"assets/loss_plots/{text}_DenseNet_121_Model_Loss_{i}.png")
             plt.figure()
             plt.clf()
-            plt.close()
