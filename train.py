@@ -70,7 +70,7 @@ for X, y in train_loader:
 # Get cpu or gpu device for training.
 print(f"Device Type: {device} device.")
 print(f"Epochs: {epochs} epochs.")
-print()
+print(f"Num Classes: {num_classes}")
 
 with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
@@ -91,12 +91,12 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             # model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
             # model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
 
-            print("Before:\n", model)
+            # print("Before:\n", model)
 
             # Replace afs in hidden layers
             replace_afs(module = model, func = func)  
 
-            print("\nAfter replace AFs:\n", model)
+            # print("\nAfter replace AFs:\n", model)
 
             # Optimizing the model parameters
             loss_fn = nn.CrossEntropyLoss()
