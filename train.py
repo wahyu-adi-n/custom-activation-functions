@@ -1,6 +1,6 @@
 from torch import nn
 from torchvision import models
-from config.config import afs_dict, device, epochs
+from config.config import afs_dict, device, epochs, num_classes
 from utils.data_preparation import load_data_loader_preparation
 from utils.helper import replace_afs
 from model.small_nn import NeuralNetwork
@@ -84,6 +84,7 @@ with open("assets/logs/densenet_121_results.csv", mode="w") as csv_file:
             # Define model
             # Using pre-trained models
             model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
+            model.classifier = nn.Linear(in_features=model.classifier.in_features, out_features=num_classes)
             model.to(device)
 
             # model = NeuralNetwork().to(device)
