@@ -15,53 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-# Creating training loop
-# def train(dataloader, model, loss_fn, optimizer, device):
-#     size = len(dataloader.dataset)
-#     num_batches = len(dataloader)
-#     model.train()
-#     train_loss, correct = 0, 0
-#     for batch, (X, y) in enumerate(dataloader):
-#         X, y = X.to(device), y.to(device)
-
-#         # Compute prediction error
-#         pred = model(X)
-#         loss = loss_fn(pred, y)
-
-#         # Backpropagation
-#         optimizer.zero_grad()
-#         loss.backward()
-#         optimizer.step()
-
-#         train_loss += loss_fn(pred, y).item()
-#         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-#         if batch % 100 == 0:
-#             loss, current = loss.item(), batch * len(X)
-#             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
-#     train_loss /= num_batches
-#     correct /= size
-#     print(f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n")
-#     train_accuracy_list.append(correct)
-#     train_loss_list.append(train_loss)
-
-# Creating testing loop
-# def evaluate(dataloader, model, loss_fn, device):
-#     size = len(dataloader.dataset)
-#     num_batches = len(dataloader)
-#     model.eval()
-#     test_loss, correct = 0, 0
-#     with torch.no_grad():
-#         for X, y in dataloader:
-#             X, y = X.to(device), y.to(device)
-#             pred = model(X)
-#             test_loss += loss_fn(pred, y).item()
-#             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-#     test_loss /= num_batches
-#     correct /= size
-#     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-#     test_accuracy_list.append(correct)
-#     test_loss_list.append(test_loss)
-
 # Dataset, data loaders preparation
 train_loader, val_loader, test_loader = load_data_loader_preparation()
 
@@ -205,28 +158,6 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
                                       train_loss_savings[-1], 
                                       val_loss_savings[-1], 
                                       loop_end_time - loop_start_time])
-
-        # train_accuracy_list = []
-        # test_accuracy_list = []
-        # train_loss_list = []
-        # test_loss_list = []
-        
-
-        # # Training and testing the network
-        # for t in range(epochs):
-        #     loop_start_time = time.perf_counter()
-        #     print(f"Epoch {t+1}\n-------------------------------")
-        #     train(train_loader, model, loss_fn, optimizer, device)
-        #     evaluate(val_loader, model, loss_fn, device)
-            
-        #     # # Update scheduler (learning rate adapter)
-        #     scheduler.step()
-            
-        #     # Write results to csv [act_func, epoch, train acc, test acc, train loss, test loss]
-        #     # Last element in accuracy and lost list should be results for the epoch that it has just done
-        #     loop_end_time = time.perf_counter()
-        #     csv_file_writer.writerow([text, t+1, train_accuracy_list[-1], test_accuracy_list[-1], train_loss_list[-1], test_loss_list[-1], loop_end_time - loop_start_time])
-            
         print("Training Done!")
 
         # Saving the model
