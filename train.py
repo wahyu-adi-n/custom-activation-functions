@@ -1,62 +1,66 @@
 from torch import nn
 from torchvision import models
-from config.config import afs_dict, device, epochs, num_classes
+from config.config import *
 from utils.data_preparation import load_data_loader_preparation
-from utils.helper import replace_afs
+from utils.helper import *
 from model.small_nn import NeuralNetwork
 from model.resnet import ResidualBlock, ResNet
+from sklearn.metrics import classification_report, confusion_matrix
 
 import torch
 import csv
 import time
+import copy
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 # Creating training loop
-def train(dataloader, model, loss_fn, optimizer, device):
-    size = len(dataloader.dataset)
-    num_batches = len(dataloader)
-    model.train()
-    train_loss, correct = 0, 0
-    for batch, (X, y) in enumerate(dataloader):
-        X, y = X.to(device), y.to(device)
+# def train(dataloader, model, loss_fn, optimizer, device):
+#     size = len(dataloader.dataset)
+#     num_batches = len(dataloader)
+#     model.train()
+#     train_loss, correct = 0, 0
+#     for batch, (X, y) in enumerate(dataloader):
+#         X, y = X.to(device), y.to(device)
 
-        # Compute prediction error
-        pred = model(X)
-        loss = loss_fn(pred, y)
+#         # Compute prediction error
+#         pred = model(X)
+#         loss = loss_fn(pred, y)
 
-        # Backpropagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+#         # Backpropagation
+#         optimizer.zero_grad()
+#         loss.backward()
+#         optimizer.step()
 
-        train_loss += loss_fn(pred, y).item()
-        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-        if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
-    train_loss /= num_batches
-    correct /= size
-    print(f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n")
-    train_accuracy_list.append(correct)
-    train_loss_list.append(train_loss)
+#         train_loss += loss_fn(pred, y).item()
+#         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+#         if batch % 100 == 0:
+#             loss, current = loss.item(), batch * len(X)
+#             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+#     train_loss /= num_batches
+#     correct /= size
+#     print(f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n")
+#     train_accuracy_list.append(correct)
+#     train_loss_list.append(train_loss)
 
 # Creating testing loop
-def evaluate(dataloader, model, loss_fn, device):
-    size = len(dataloader.dataset)
-    num_batches = len(dataloader)
-    model.eval()
-    test_loss, correct = 0, 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(device), y.to(device)
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-    test_loss /= num_batches
-    correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-    test_accuracy_list.append(correct)
-    test_loss_list.append(test_loss)
+# def evaluate(dataloader, model, loss_fn, device):
+#     size = len(dataloader.dataset)
+#     num_batches = len(dataloader)
+#     model.eval()
+#     test_loss, correct = 0, 0
+#     with torch.no_grad():
+#         for X, y in dataloader:
+#             X, y = X.to(device), y.to(device)
+#             pred = model(X)
+#             test_loss += loss_fn(pred, y).item()
+#             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+#     test_loss /= num_batches
+#     correct /= size
+#     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+#     test_accuracy_list.append(correct)
+#     test_loss_list.append(test_loss)
 
 # Dataset, data loaders preparation
 train_loader, val_loader, test_loader = load_data_loader_preparation()
@@ -72,94 +76,250 @@ print(f"Device Type: {device} device.")
 print(f"Epochs: {epochs} epochs.")
 print(f"Num Classes: {num_classes}")
 
-with open("assets/logs/densenet_201_results.csv", mode="w") as csv_file:
+with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
     csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)"])
 
     # for each activation function
     for text, func in afs_dict.items():
-
-        #test each function 1 times in order to caluclate statistics
-        for i in range(1, 2):
-            # Define model
-            # Using pre-trained models
-            model = models.efficientnet_b7(weights=models.EfficientNet_B7_Weights_Weights.IMAGENET1K_V1)
-            model.classifier[1] = nn.Linear(2560, num_classes)
+        
+        # Define model
+        # Using pre-trained models
+        
+        # 1. DenseNet201
+        model = models.densenet201(weights=models.DenseNet201_Weights.IMAGENET1K_V1)
             
-            # Add custom layers
-            # model.classifier = nn.Sequential(
-            #         nn.Linear(model.classifier.in_features, 512),
-            #         nn.Linear(512, 256),
-            #         nn.Dropout(0.2),
-            #         nn.Linear(256, num_classes)
-            #     )
+        for parameter in model.parameters():
+            parameter.requires_grad = False
+        
+        model.classifier = nn.Linear(1920, num_classes)
+        
+        # 2. ResNet152v2
+        # model = models.resnet152(weights=models.ResNet152_Weights.IMAGENET1K_V2)
             
-            model.to(device)
+        # for parameter in model.parameters():
+        #     parameter.requires_grad = False
+        
+        # model.fc = nn.Linear(2048, num_classes)
+        
+        # 3. VGG19
+        # model = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1)
+            
+        # for parameter in model.parameters():
+        #     parameter.requires_grad = False
+        
+        # model.classifier[6] = nn.Linear(4096, num_classes)
+    
+        # Add custom layers (future works)
+        # model.classifier = nn.Sequential(
+        #                           nn.Linear(model.classifier.in_features, 64),
+        #                           nn.Linear(64, 32),
+        #                           nn.Dropout(0.2),
+        #                           nn.Linear(32, num_classes)
+        #                      )
+            
+        model.to(device)
 
-            # model = NeuralNetwork().to(device)
-            # model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
-            # model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
+        # model = NeuralNetwork().to(device)
+        # model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
+        # model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
 
-            # print("Before:\n", model)
+        # print("Before:\n", model)
 
-            # Replace afs in hidden layers
-            replace_afs(module = model, func = func)  
+        # Replace afs in hidden layers
+        replace_afs(module = model, func = func)  
 
-            # print("\nAfter replace AFs:\n", model)
+        # print("\nAfter replace AFs:\n", model)
 
-            # Optimizing the model parameters
-            loss_fn = nn.CrossEntropyLoss()
-            optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
-            # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.1)
+        # Optimizing the model parameters
+        loss_function = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.1)
+        
+        # Monitor 'val_loss'
+        best_val_loss = float('inf')
 
-            train_accuracy_list = []
-            test_accuracy_list = []
-            train_loss_list = []
-            test_loss_list = []
+        # For the records
+        train_loss_savings = []
+        train_acc_savings  = []
+        val_loss_savings   = []
+        val_acc_savings    = []
 
-            # Training and testing the network
-            for t in range(epochs):
-                loop_start_time = time.perf_counter()
-                print(f"Epoch {t+1}\n-------------------------------")
-                train(train_loader, model, loss_fn, optimizer, device)
-                evaluate(val_loader, model, loss_fn, device)
+        # Saving the model
+        best_model = copy.deepcopy(model.state_dict())
+        
+        # Counter for early stopping
+        early_stopping_counter = 0
+
+        # ======================================
+        #   TRAINING STEP
+        # ======================================
+        for epoch in range(epochs):
+            # Init Time
+            loop_start_time = time.perf_counter()
+            
+            # Training step
+            train_loss, train_acc = training_step(model, 
+                                                  train_loader, 
+                                                  loss_function, 
+                                                  optimizer, 
+                                                  device)
+            train_loss_savings.append(train_loss)
+            train_acc_savings.append(train_acc.item())
+
+            # Evaluation step
+            val_loss, val_acc = evaluate_model(model, 
+                                               val_loader, 
+                                               loss_function, 
+                                               device)
+            val_loss_savings.append(val_loss)
+            val_acc_savings.append(val_acc.item())
+
+            # Print results
+            print(f'Epoch: {epoch+1} / {epochs} - train_loss: {train_loss:.4f} - train_accuracy: {train_acc:.4f} - val_loss: {val_loss:.4f} - val_accuracy: {val_acc:.4f}')
+
+            # If the val_loss improved, save the model
+            if val_loss < best_val_loss:
+                print(f'Epoch: {epoch+1:02}/{epochs} - val_loss improved from {best_val_loss:.4f} to {val_loss:.4f}, new model saved')
+                best_val_loss = val_loss
+                best_model = copy.deepcopy(model.state_dict())
+                early_stopping_counter = 0  # reset the counter
+            else:
+                print(f'Epoch: {epoch+1:02}/{epochs} - val_loss did not improve')
+                early_stopping_counter += 1
                 
-                # # Update scheduler (learning rate adapter)
-                # scheduler.step()
-                
-                # Write results to csv [act_func, epoch, train acc, test acc, train loss, test loss]
-                # Last element in accuracy and lost list should be results for the epoch that it has just done
-                loop_end_time = time.perf_counter()
-                csv_file_writer.writerow([text, t+1, train_accuracy_list[-1], test_accuracy_list[-1], train_loss_list[-1], test_loss_list[-1], loop_end_time - loop_start_time])
+                # Check if early stopping criteria are met
+                if early_stopping_counter >= patience:
+                    print(f'Early stopping! No improvement for {patience} consecutive epochs.')
+                    break  # Stop training
+
+            # Update scheduler (learning rate adapter)
+            scheduler.step()
             
-            print("Training Done!")
+            # Write results to csv [act_func, epoch, train acc, test acc, train loss, test loss]
+            # Last element in accuracy and lost list should be results for the epoch that it has just done
+            loop_end_time = time.perf_counter()
+            csv_file_writer.writerow([text, epoch+1, 
+                                      train_acc_savings[-1], 
+                                      val_acc_savings[-1], 
+                                      train_loss_savings[-1], 
+                                      val_loss_savings[-1], 
+                                      loop_end_time - loop_start_time])
 
-            # Saving the model
-            # save the model with afs in the name as well iteration
-            torch.save(model.state_dict(), f"assets/weights/{text}_DenseNet201_{i}.pt")
-            print(f"Saved PyTorch Model State to {text}_{i}.pt\n")
+        # train_accuracy_list = []
+        # test_accuracy_list = []
+        # train_loss_list = []
+        # test_loss_list = []
+        
 
-            # Creating plot
-            epoch = range(1, len(test_accuracy_list) +1)
+        # # Training and testing the network
+        # for t in range(epochs):
+        #     loop_start_time = time.perf_counter()
+        #     print(f"Epoch {t+1}\n-------------------------------")
+        #     train(train_loader, model, loss_fn, optimizer, device)
+        #     evaluate(val_loader, model, loss_fn, device)
+            
+        #     # # Update scheduler (learning rate adapter)
+        #     scheduler.step()
+            
+        #     # Write results to csv [act_func, epoch, train acc, test acc, train loss, test loss]
+        #     # Last element in accuracy and lost list should be results for the epoch that it has just done
+        #     loop_end_time = time.perf_counter()
+        #     csv_file_writer.writerow([text, t+1, train_accuracy_list[-1], test_accuracy_list[-1], train_loss_list[-1], test_loss_list[-1], loop_end_time - loop_start_time])
+            
+        print("Training Done!")
 
-            # Plottinf Model Accuracy Curve
-            plt.plot(epoch, train_accuracy_list, label="train")
-            plt.plot(epoch, test_accuracy_list, label="val")
-            plt.title(f"{text} - DenseNet201 Model Accuracy {i}")
-            plt.xlabel("epoch")
-            plt.ylabel("accuracy")
-            plt.legend()
-            plt.savefig(f"assets/acc_plots/{text}_DenseNet_201_Model_Accuracy_{i}.png")
-            plt.figure()
-            plt.clf()
+        # Saving the model
+        # save the model with afs in the name as well iteration
+        path_best_model = f"assets/weights/"
+        torch.save(model.state_dict(), path_best_model + f"{text}_{model_name}.pt")
+        print(f"Saved PyTorch Model State to {text}-{model_name}.pt\n")
+            
+        model.load_state_dict(torch.load(path_best_model + f"{text}_{model_name}.pt"))
 
-            # Plotting Model Loss Curve
-            plt.plot(epoch, train_loss_list, label="train")
-            plt.plot(epoch, test_loss_list, label="val")
-            plt.title(f"{text} - DenseNet201 Model Loss {i}")
-            plt.xlabel("epoch")
-            plt.ylabel("loss")
-            plt.legend()
-            plt.savefig(f"assets/loss_plots/{text}_DenseNet_201_Model_Loss_{i}.png")
-            plt.figure()
-            plt.clf()
+        # Creating plot
+        epoch = range(1, len(val_loss_savings) +1)
+
+        # Plottinf Model Accuracy Curve
+        plt.plot(epoch, train_acc_savings, label="train")
+        plt.plot(epoch, val_acc_savings, label="val")
+        plt.title(f"{text}-{model_name} Model Accuracy")
+        plt.xlabel("epoch")
+        plt.ylabel("accuracy")
+        plt.legend()
+        plt.savefig(f"assets/acc_plots/{text}_{model_name}_Model_Accuracy.png")
+        plt.figure()
+        plt.clf()
+
+        # Plotting Model Loss Curve
+        plt.plot(epoch, train_loss_savings, label="train")
+        plt.plot(epoch, val_loss_savings, label="val")
+        plt.title(f"{text}-{model_name} Model Loss")
+        plt.xlabel("epoch")
+        plt.ylabel("loss")
+        plt.legend()
+        plt.savefig(f"assets/loss_plots/{text}_{model_name}_Model_Loss.png")
+        plt.figure()
+        plt.clf()
+        
+        # Evaluate the model on test data
+        images, labels, probs, preds, accuracy = get_probs_and_preds(model, test_loader, device)
+
+        # Calculate additional metrics
+        report = classification_report(labels, preds)
+        
+        # Specify the file path where you want to save the report
+        file_path = f'assets/classification_report/Classification_Report_{text}_{model_name}.txt'
+
+        # Write the report to the file
+        with open(file_path, 'w') as file:
+            file.write(f'Accuracy on test dataloader: {accuracy:.4f}')
+            file.write(report)
+            
+        print(f'Classification report saved to assets/classification_report')
+
+        # Print results
+        print(f'Accuracy on test dataloader: {accuracy:.4f}')
+        print(report)
+        
+        # Build the confusion matrix
+        cm = confusion_matrix(labels, preds)
+
+        # Normalize the confusion matrix
+        cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+        # Ticklables
+        ticklabels = class_index.values()
+
+        # Plot
+        fig, ax = plt.subplots(figsize=(15,5))
+
+        # Confusion matrix
+        ax1 = plt.subplot(1, 2, 1)
+        sns.heatmap(cm, annot=True, fmt='.3g', 
+                    xticklabels=ticklabels, 
+                    yticklabels=ticklabels, 
+                    cmap=plt.cm.Blues);
+        plt.title('Confusion Matrix');
+        plt.xlabel('Predicted');
+        plt.ylabel('Actual');
+
+        # Normalized confusion matrix
+        ax2 = plt.subplot(1, 2, 2)
+        sns.heatmap(cmn, annot=True, fmt='.3f', 
+                    xticklabels=ticklabels, 
+                    yticklabels=ticklabels, 
+                    cmap=plt.cm.Blues);
+        plt.title('Normalized Confusion Matrix');
+        plt.xlabel('Predicted');
+        plt.ylabel('Actual');
+        
+        # Explicitly remove overlapping axes
+        ax1.remove()
+        ax2.remove()
+
+        plt.subplots_adjust(wspace=.3)
+        
+        # Save the figure
+        plt.savefig(f'assets/confusion_matrix/Confusion_Matrix_{text}_{model_name}.png')
+        print(f'Classification report saved to assets/confusion_matrix')
