@@ -12,11 +12,11 @@ afs_dict = {
                 'DiffYRelu_1.0' : custom_afs.Diff_Y_ReLU(1.0),
                 'SmallNeg_0.1' : custom_afs.Small_Neg(0.1),
                 # 'SmallNeg_0.2' : custom_afs.Small_Neg(0.2),
-                'SmallNeg_0.3' : custom_afs.Small_Neg(0.3),
+                # 'SmallNeg_0.3' : custom_afs.Small_Neg(0.3),
                 # 'SmallNeg_0.4' : custom_afs.Small_Neg(0.4),
                 'SmallNeg_0.5' : custom_afs.Small_Neg(0.5),
                 'PosHill_0.25' : custom_afs.Pos_Hill_V1(0.25),
-                'PosHill_0.5' : custom_afs.Pos_Hill_V1(0.5),
+                # 'PosHill_0.5' : custom_afs.Pos_Hill_V1(0.5),
                 'PosHill_0.75' : custom_afs.Pos_Hill_V1(0.75),
                 'Pos_Hill_V2' : custom_afs.Pos_Hill_V2((-1,0), (0,1), (1,0)),
                 # 'Pos_Hill_V2_s' : custom_afs.Pos_Hill_V2((-0.5,0),(0,1.25),(0.5,0)),
@@ -35,7 +35,7 @@ afs_dict = {
 device = "cuda" if torch.cuda.is_available() else "cpu"
 epochs = 100
 # Patience for early stopping
-patience = 10
+patience = 5
 classes = ['normal', 'pneumonia']
 class_index = {0: 'NORMAL', 1: 'PNEUMONIA'}
 num_classes = len(classes)

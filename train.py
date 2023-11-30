@@ -204,7 +204,7 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
 
         # Write the report to the file
         with open(file_path, 'w') as file:
-            file.write(f'Accuracy on test dataloader: {accuracy:.4f}')
+            file.write(f'Accuracy on test dataloader: {accuracy:.4f}\n')
             file.write(report)
             
         print(f'Classification report saved to assets/classification_report')
@@ -226,31 +226,30 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
         fig, ax = plt.subplots(figsize=(15,5))
 
         # Confusion matrix
-        ax1 = plt.subplot(1, 2, 1)
+        plt.subplot(1, 2, 1)
         sns.heatmap(cm, annot=True, fmt='.3g', 
                     xticklabels=ticklabels, 
                     yticklabels=ticklabels, 
-                    cmap=plt.cm.Blues);
-        plt.title('Confusion Matrix');
-        plt.xlabel('Predicted');
-        plt.ylabel('Actual');
+                    cmap=plt.cm.Blues)
+        plt.title('Confusion Matrix')
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
 
         # Normalized confusion matrix
-        ax2 = plt.subplot(1, 2, 2)
+        plt.subplot(1, 2, 2)
         sns.heatmap(cmn, annot=True, fmt='.3f', 
                     xticklabels=ticklabels, 
                     yticklabels=ticklabels, 
                     cmap=plt.cm.Blues);
         plt.title('Normalized Confusion Matrix');
         plt.xlabel('Predicted');
-        plt.ylabel('Actual');
-        
-        # Explicitly remove overlapping axes
-        ax1.remove()
-        ax2.remove()
+        plt.ylabel('Actual'); 
 
         plt.subplots_adjust(wspace=.3)
         
         # Save the figure
         plt.savefig(f'assets/confusion_matrix/Confusion_Matrix_{text}_{model_name}.png')
+        plt.figure()
+        plt.clf()
+
         print(f'Classification report saved to assets/confusion_matrix')
