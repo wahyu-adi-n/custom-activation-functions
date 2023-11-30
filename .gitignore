@@ -1,7 +1,5 @@
-/afs
 /chest_xray
 __pycache__/
 chest_xray.zip
 *.pt
 *.pth
-assets/
