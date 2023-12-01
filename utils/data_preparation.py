@@ -1,5 +1,11 @@
 from torchvision import transforms, datasets
+from imblearn.over_sampling import SMOTE
+from torch.utils.data import DataLoader, TensorDataset
+from torchvision import transforms
+from collections import Counter
+
 import torch
+import numpy as np
 
 def set_random_seeds(seed=42):
     torch.manual_seed(seed)
@@ -39,14 +45,79 @@ def load_data_loader_preparation(batch_size: int = 64):
         
     train_data, val_data, test_data = data_prep()
     # Create data loaders.
-    train_loader = torch.utils.data.DataLoader(train_data, 
-                                               batch_size = batch_size, 
-                                               shuffle = True)
-    val_loader   = torch.utils.data.DataLoader(val_data, 
-                                               batch_size = batch_size, 
-                                               shuffle =  False)
-    test_loader   = torch.utils.data.DataLoader(test_data,
-                                                batch_size = batch_size, 
-                                                shuffle =  False)
+    train_loader = DataLoader(train_data, 
+                              batch_size = batch_size, 
+                              shuffle = True)
+    val_loader   = DataLoader(val_data, 
+                              batch_size = batch_size,
+                              shuffle =  False)
+    test_loader   = DataLoader(test_data,
+                               batch_size = batch_size, 
+                               shuffle =  False)
     
     return train_loader, val_loader, test_loader                                           
+
+def load_data_loader_preparation_smote(batch_size: int = 64):
+    set_random_seeds()  # Set random seeds before data preparation
+        
+    train_data, val_data, test_data = data_prep()
+    
+    # Apply SMOTE to all data
+    X_train = np.array([item[0].numpy().flatten() for item in train_data])
+    y_train = np.array([item[1] for item in train_data])
+    
+    X_val = np.array([item[0].numpy() for item in val_data])
+    y_val = np.array([item[1] for item in val_data])
+    
+    X_test = np.array([item[0].numpy() for item in test_data])
+    y_test = np.array([item[1] for item in test_data])
+    
+    # Reshape the image arrays to 2D
+    X_train_flat = X_train.reshape(X_train.shape[0], -1)
+    X_val_flat = X_val.reshape(X_val.shape[0], -1)
+    X_test_flat = X_test.reshape(X_test.shape[0], -1)
+    
+    smote = SMOTE(sampling_strategy='auto', random_state=42)
+    
+    X_resampled_train, y_resampled_train = smote.fit_resample(X_train_flat, y_train)
+    
+    X_resampled_val, y_resampled_val = smote.fit_resample(X_val_flat, y_val)
+    
+    X_resampled_test, y_resampled_test = smote.fit_resample(X_test_flat, y_test)
+    
+    counter_resampled = Counter(y_resampled_train)
+
+    # Print the count for each class
+    for class_label, count in counter_resampled.items():
+        print(f"Class {class_label}: {count} instances")
+
+    # Convert NumPy arrays to PyTorch tensors
+    X_resampled_train = torch.tensor(X_resampled_train, dtype=torch.float32)
+    y_resampled_train = torch.tensor(y_resampled_train, dtype=torch.long)
+    
+    X_resampled_val = torch.tensor(X_resampled_val, dtype=torch.float32)
+    y_resampled_val = torch.tensor(y_resampled_val, dtype=torch.long)
+    
+    X_resampled_test = torch.tensor(X_resampled_test, dtype=torch.float32)
+    y_resampled_test = torch.tensor(y_resampled_test, dtype=torch.long)
+    
+    # Create PyTorch datasets and dataloaders
+    train_data_smote = TensorDataset(X_resampled_train, y_resampled_train)
+    val_data_smote =  TensorDataset(X_resampled_val, y_resampled_val)
+    test_data_smote = TensorDataset(X_resampled_test, y_resampled_test)
+
+    # Create data loaders.
+    train_loader = DataLoader(train_data_smote, 
+                              batch_size = batch_size, 
+                              shuffle = True)
+    val_loader   = DataLoader(val_data_smote, 
+                              batch_size = batch_size, 
+                              shuffle =  False)
+    test_loader   = DataLoader(test_data_smote, 
+                               batch_size = batch_size, 
+                               shuffle =  False)
+    
+    return train_loader, val_loader, test_loader
+
+if __name__ == '__main__':
+    train_loader, val_loader, test_loader = load_data_loader_preparation_smote()

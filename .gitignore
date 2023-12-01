@@ -4,3 +4,8 @@ chest_xray.zip
 *.pt
 *.pth
 .ipynb_checkpoints/
+*.jpeg
+*.jpeg
+*.png
+*.txt
+*.csv

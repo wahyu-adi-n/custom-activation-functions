@@ -30,12 +30,16 @@ print(f"Device Type: {device} device.")
 print(f"Epochs: {epochs} epochs.")
 print(f"Num Classes: {num_classes}")
 
-with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
+with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
     csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)", "Best Model(?)"])
 
+    start_training = time.time()
+    path_best_model = f"assets/weights/"
+    
     # for each activation function
     for text, func in afs_dict.items():
+        print(f"\n{text} Activation Functions")
         
         # Define model
         # Using pre-trained models
@@ -88,7 +92,7 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
         # Optimizing the model parameters
         loss_function = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.1)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
         
         # Monitor 'val_loss'
         best_val_loss = float('inf')
@@ -138,8 +142,15 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
                 print(f'Epoch: {epoch+1:02}/{epochs} - val_loss improved from {best_val_loss:.4f} to {val_loss:.4f}, new model saved')
                 best_val_loss = val_loss
                 best_model = copy.deepcopy(model.state_dict())
+                
+                # Saving the model
+                # save the model with afs in the name as well iteration
+                torch.save(model.state_dict(), path_best_model + f"{text}_{model_name}.pt")
+                print(f"Saved PyTorch Best Model State to {text}-{model_name}.pt\n")
+                
                 early_stopping_counter = 0  # reset the counter
                 is_best = True
+            
             else:
                 print(f'Epoch: {epoch+1:02}/{epochs} - val_loss did not improve')
                 early_stopping_counter += 1
@@ -162,13 +173,8 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
                                       val_loss_savings[-1], 
                                       loop_end_time - loop_start_time,
                                       is_best])
-        print("Training Complete!")
-
-        # Saving the model
-        # save the model with afs in the name as well iteration
-        path_best_model = f"assets/weights/"
-        torch.save(model.state_dict(), path_best_model + f"{text}_{model_name}.pt")
-        print(f"Saved PyTorch Model State to {text}-{model_name}.pt\n")
+        print(f"Training {text}-{model_name} is completed in {(time.time() -  start_training):.4f} s!")
+        start_training = time.time() # reset time
             
         model.load_state_dict(torch.load(path_best_model + f"{text}_{model_name}.pt"))
 
@@ -241,10 +247,7 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
 
         # Normalized confusion matrix
         plt.subplot(1, 2, 2)
-        sns.heatmap(cmn, annot=True, fmt='.3f', 
-                    xticklabels=ticklabels, 
-                    yticklabels=ticklabels, 
-                    cmap=plt.cm.Blues);
+        sns.heatmap(cmn, annot=True, fmt='.3f', xticklabels=ticklabels, yticklabels=ticklabels, cmap=plt.cm.Blues);
         plt.title('Normalized Confusion Matrix');
         plt.xlabel('Predicted');
         plt.ylabel('Actual'); 
@@ -255,5 +258,3 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
         plt.savefig(f'assets/confusion_matrix/Confusion_Matrix_{text}_{model_name}.png')
         plt.figure()
         plt.clf()
-
-        print(f'Classification report saved to assets/confusion_matrix')
