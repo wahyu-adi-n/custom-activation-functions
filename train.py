@@ -6,6 +6,7 @@ from utils.helper import *
 from model.small_nn import NeuralNetwork
 from model.resnet import ResidualBlock, ResNet
 from sklearn.metrics import classification_report, confusion_matrix
+from tqdm import tqdm
 
 import torch
 import csv
@@ -31,7 +32,7 @@ print(f"Num Classes: {num_classes}")
 
 with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
-    csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)"])
+    csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)", "Best Model(?)"])
 
     # for each activation function
     for text, func in afs_dict.items():
@@ -103,11 +104,12 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
         
         # Counter for early stopping
         early_stopping_counter = 0
+        is_best = False
 
         # ======================================
         #   TRAINING STEP
         # ======================================
-        for epoch in range(epochs):
+        for epoch in tqdm(range(epochs), desc="Training Epochs"):
             # Init Time
             loop_start_time = time.perf_counter()
             
@@ -137,15 +139,16 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
                 best_val_loss = val_loss
                 best_model = copy.deepcopy(model.state_dict())
                 early_stopping_counter = 0  # reset the counter
+                is_best = True
             else:
                 print(f'Epoch: {epoch+1:02}/{epochs} - val_loss did not improve')
                 early_stopping_counter += 1
-                
+                is_best = False
                 # Check if early stopping criteria are met
                 if early_stopping_counter >= patience:
                     print(f'Early stopping! No improvement for {patience} consecutive epochs.')
                     break  # Stop training
-
+                    
             # Update scheduler (learning rate adapter)
             scheduler.step()
             
@@ -157,8 +160,9 @@ with open("assets/logs/densenet201_results.csv", mode="w") as csv_file:
                                       val_acc_savings[-1], 
                                       train_loss_savings[-1], 
                                       val_loss_savings[-1], 
-                                      loop_end_time - loop_start_time])
-        print("Training Done!")
+                                      loop_end_time - loop_start_time,
+                                      is_best])
+        print("Training Complete!")
 
         # Saving the model
         # save the model with afs in the name as well iteration
