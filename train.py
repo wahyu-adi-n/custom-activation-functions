@@ -1,10 +1,7 @@
 from torch import nn
 from torchvision import models
 from config.config import *
-from utils.data_preparation import load_data_loader_preparation
 from utils.helper import *
-from model.small_nn import NeuralNetwork
-from model.resnet import ResidualBlock, ResNet
 from sklearn.metrics import classification_report, confusion_matrix
 from tqdm import tqdm
 
@@ -26,11 +23,19 @@ val_loader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
 test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
 
 # 2. SMOTE Data
-smote_train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
-smote_val_loader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
-smote_test_loader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
+# smote_train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
+# smote_val_loader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
+# smote_test_loader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
 
-print("[INFO] All data succesfully loaded!")
+# 3. CLAHE Data
+# clahe_train_loader = torch.load(os.path.join(data_path,'clahe_train_loader.pkl'))
+# clahe_val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader.pkl'))
+# clahe_test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader.pkl'))
+
+# # 4. CLAHE + SMOTE Data
+# clahe_smote_train_loader = torch.load(os.path.join(data_path,'clahe_train_loader_smote.pkl'))
+# clahe_smote_val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader_smote.pkl'))
+# clahe_smote_test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader_smote.pkl'))
 
 for X, y in train_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
