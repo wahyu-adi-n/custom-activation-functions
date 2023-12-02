@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     print("[INFO] Dataloader succesfully saved!")
     
-    train_loader_smote, val_loader_smote, test_loader_smote = load_data_loader_preparation()
+    train_loader_smote, val_loader_smote, test_loader_smote = load_data_loader_preparation_smote()
 
     torch.save(train_loader_smote, os.path.join(saved_data_path,'train_loader_smote.pkl'))
     torch.save(val_loader_smote, os.path.join(saved_data_path, 'val_loader_smote.pkl'))
