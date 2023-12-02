@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 
-root_path = "chest_xray/"
+root_path = "clahe_chest_xray/"
 
 for dirpath, dirnames, filenames in os.walk(root_path):
     for file in filenames:
