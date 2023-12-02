@@ -110,7 +110,7 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
 
         # Optimizing the model parameters
         loss_function = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.classifier.parameters() if model_name is not "ResNet152v2" else model.fc.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.classifier.parameters() if model_name != "ResNet152v2" else model.fc.parameters(), lr=0.001)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
         
         # Monitor 'val_loss'
