@@ -23,13 +23,17 @@ def data_prep():
                                 transforms.RandomHorizontalFlip(),
                                 transforms.RandomRotation(10),
                                 transforms.RandomGrayscale(),
-                                transforms.ToTensor()
+                                transforms.ToTensor(),
+                                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                     std=[0.229, 0.224, 0.225])
                             ])
 
     test_data_transform = transforms.Compose([
                                 transforms.Resize((256, 256)),
                                 transforms.CenterCrop(224),
-                                transforms.ToTensor()
+                                transforms.ToTensor(),
+                                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                     std=[0.229, 0.224, 0.225])
                             ])
 
     # Assosciate the dataset and the transformations with ImageFolder
@@ -120,4 +124,31 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
     return train_loader, val_loader, test_loader
 
 if __name__ == '__main__':
-    train_loader, val_loader, test_loader = load_data_loader_preparation_smote()
+    
+    saved_data_path = 'data/'
+
+    if not os.path.exists(saved_data_path):
+        os.makedirs(saved_data_path, exist_ok=True)
+
+    train_data, val_data, test_data =  data_prep()
+
+    torch.save(train_data, os.path.join(saved_data_path, 'train_data.pkl'))
+    torch.save(val_data, os.path.join(saved_data_path, 'val_data.pkl'))
+    torch.save(test_data, os.path.join(saved_data_path, 'test_data.pkl'))
+    print("[INFO] Data succesfully saved!")
+    
+    train_loader, val_loader, test_loader = load_data_loader_preparation()
+
+    torch.save(train_loader, os.path.join(saved_data_path,'train_loader.pkl'))
+    torch.save(val_loader, os.path.join(saved_data_path, 'val_loader.pkl'))
+    torch.save(test_loader, os.path.join(saved_data_path, 'test_loader.pkl'))
+
+    print("[INFO] Dataloader succesfully saved!")
+    
+    train_loader_smote, val_loader_smote, test_loader_smote = load_data_loader_preparation()
+
+    torch.save(train_loader_smote, os.path.join(saved_data_path,'train_loader_smote.pkl'))
+    torch.save(val_loader_smote, os.path.join(saved_data_path, 'val_loader_smote.pkl'))
+    torch.save(test_loader_smote, os.path.join(saved_data_path, 'test_loader_smote.pkl'))
+
+    print("[INFO] SMOTE Dataloader succesfully saved!")

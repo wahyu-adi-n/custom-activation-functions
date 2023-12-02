@@ -15,9 +15,22 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import os
 
-# Dataset, data loaders preparation
-train_loader, val_loader, test_loader = load_data_loader_preparation()
+# Data loaders preparation
+data_path = 'data/'
+
+# 1. Original Data
+train_loader = torch.load(os.path.join(data_path,'train_loader.pkl'))
+val_dataloader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
+test_dataloader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
+
+# 2. SMOTE Data
+train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
+val_dataloader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
+test_dataloader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
+
+print("[INFO] All data succesfully loaded!")
 
 for X, y in train_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
@@ -30,9 +43,12 @@ print(f"Device Type: {device} device.")
 print(f"Epochs: {epochs} epochs.")
 print(f"Num Classes: {num_classes}")
 
-with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
+with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
-    csv_file_writer.writerow(["Activation Function", "Epoch", "Training Accuracy", "Test Accuracy", "Training Loss", "Test Loss", "Time(s)", "Best Model(?)"])
+    csv_file_writer.writerow(["Activation Function",
+                              "Epoch", "Training Accuracy", 
+                              "Test Accuracy", "Training Loss", 
+                              "Test Loss", "Time(s)", "Best Model(?)"])
 
     start_training = time.time()
     path_best_model = f"assets/weights/"
@@ -44,29 +60,32 @@ with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
         # Define model
         # Using pre-trained models
         
-        # 1. DenseNet201
-        model = models.densenet201(weights=models.DenseNet201_Weights.IMAGENET1K_V1)
+        if model_name == "DenseNet201":
+            # 1. DenseNet201
+            model = models.densenet201(weights=models.DenseNet201_Weights.IMAGENET1K_V1)
+
+            for parameter in model.parameters():
+                parameter.requires_grad = False
+
+            model.classifier = nn.Linear(1920, num_classes)
             
-        for parameter in model.parameters():
-            parameter.requires_grad = False
+        elif model_name == "ResNet152v2":
+            # 2. ResNet152v2
+            model = models.resnet152(weights=models.ResNet152_Weights.IMAGENET1K_V2)
+
+            for parameter in model.parameters():
+                parameter.requires_grad = False
+
+            model.fc = nn.Linear(2048, num_classes)
         
-        model.classifier = nn.Linear(1920, num_classes)
-        
-        # 2. ResNet152v2
-        # model = models.resnet152(weights=models.ResNet152_Weights.IMAGENET1K_V2)
-            
-        # for parameter in model.parameters():
-        #     parameter.requires_grad = False
-        
-        # model.fc = nn.Linear(2048, num_classes)
-        
-        # 3. VGG19
-        # model = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1)
-            
-        # for parameter in model.parameters():
-        #     parameter.requires_grad = False
-        
-        # model.classifier[6] = nn.Linear(4096, num_classes)
+        elif model_name == "VGG19":
+            # 3. VGG19
+            model = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1)
+
+            for parameter in model.parameters():
+                parameter.requires_grad = False
+
+            model.classifier[6] = nn.Linear(4096, num_classes)
     
         # Add custom layers (future works)
         # model.classifier = nn.Sequential(
@@ -91,7 +110,8 @@ with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
 
         # Optimizing the model parameters
         loss_function = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.classifier.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.classifier.parameters() if model_name is not "ResNet152v2" \ 
+                                     else model.fc.parameters(), lr=0.001)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
         
         # Monitor 'val_loss'
@@ -135,7 +155,11 @@ with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
             val_acc_savings.append(val_acc.item())
 
             # Print results
-            print(f'Epoch: {epoch+1} / {epochs} - train_loss: {train_loss:.4f} - train_accuracy: {train_acc:.4f} - val_loss: {val_loss:.4f} - val_accuracy: {val_acc:.4f}')
+            print(f'Epoch: {epoch+1} / {epochs} - \
+                    train_loss: {train_loss:.4f} - \
+                    train_accuracy: {train_acc:.4f} - \
+                    val_loss: {val_loss:.4f} - \
+                    val_accuracy: {val_acc:.4f}')
 
             # If the val_loss improved, save the model
             if val_loss < best_val_loss:
@@ -173,6 +197,7 @@ with open("assets/logs/resnet152v2_results.csv", mode="w") as csv_file:
                                       val_loss_savings[-1], 
                                       loop_end_time - loop_start_time,
                                       is_best])
+            
         print(f"Training {text}-{model_name} is completed in {(time.time() -  start_training):.4f} s!")
         start_training = time.time() # reset time
             
