@@ -1,6 +1,6 @@
 /chest_xray
 __pycache__/
-chest_xray.zip
+*.zip
 *.pt
 *.pth
 .ipynb_checkpoints/
@@ -10,3 +10,4 @@ chest_xray.zip
 *.txt
 *.csv
 *.pkl
+/clahe_chest_xray
