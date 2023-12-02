@@ -6,6 +6,7 @@ from collections import Counter
 
 import torch
 import numpy as np
+import os
 
 def set_random_seeds(seed=42):
     torch.manual_seed(seed)
