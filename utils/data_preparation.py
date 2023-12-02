@@ -67,7 +67,6 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
         
     train_data, val_data, test_data = data_prep()
     
-    # Apply SMOTE to all data
     X_train = np.array([item[0].numpy().flatten() for item in train_data])
     y_train = np.array([item[1] for item in train_data])
     
@@ -77,10 +76,14 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
     X_test = np.array([item[0].numpy() for item in test_data])
     y_test = np.array([item[1] for item in test_data])
     
+    print("[INFO] Preparing data is done.")
+    
     # Reshape the image arrays to 2D
     X_train_flat = X_train.reshape(X_train.shape[0], -1)
     X_val_flat = X_val.reshape(X_val.shape[0], -1)
     X_test_flat = X_test.reshape(X_test.shape[0], -1)
+    
+    print("[INFO] Reshape the image arrays to 2D is done.")
     
     smote = SMOTE(sampling_strategy='auto', random_state=42)
     
@@ -89,6 +92,7 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
     X_resampled_val, y_resampled_val = smote.fit_resample(X_val_flat, y_val)
     
     X_resampled_test, y_resampled_test = smote.fit_resample(X_test_flat, y_test)
+    print("[INFO] Applying SMOTE is done.")
     
     counter_resampled = Counter(y_resampled_train)
 
@@ -106,10 +110,14 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
     X_resampled_test = torch.tensor(X_resampled_test, dtype=torch.float32)
     y_resampled_test = torch.tensor(y_resampled_test, dtype=torch.long)
     
-    # Create PyTorch datasets and dataloaders
+    print("[INFO] Convert NumPy arrays to PyTorch tensors is done.")
+    
+    # Create PyTorch datasets
     train_data_smote = TensorDataset(X_resampled_train, y_resampled_train)
     val_data_smote =  TensorDataset(X_resampled_val, y_resampled_val)
     test_data_smote = TensorDataset(X_resampled_test, y_resampled_test)
+    
+    print("[INFO] Create PyTorch datasets is done.")
 
     # Create data loaders.
     train_loader = DataLoader(train_data_smote, 
@@ -121,6 +129,7 @@ def load_data_loader_preparation_smote(batch_size: int = 64):
     test_loader   = DataLoader(test_data_smote, 
                                batch_size = batch_size, 
                                shuffle =  False)
+    print("[INFO] Create PyTorch dataloaders is done.")
     
     return train_loader, val_loader, test_loader
 
