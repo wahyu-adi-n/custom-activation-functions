@@ -154,11 +154,7 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
             val_acc_savings.append(val_acc.item())
 
             # Print results
-            print(f'Epoch: {epoch+1} / {epochs} - \
-                    train_loss: {train_loss:.4f} - \
-                    train_accuracy: {train_acc:.4f} - \
-                    val_loss: {val_loss:.4f} - \
-                    val_accuracy: {val_acc:.4f}')
+            print(f'Epoch: {epoch+1}/{epochs} - train_loss: {train_loss:.4f} - train_accuracy: {train_acc:.4f} - val_loss: {val_loss:.4f} - val_accuracy: {val_acc:.4f}')
 
             # If the val_loss improved, save the model
             if val_loss < best_val_loss:
