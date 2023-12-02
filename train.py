@@ -22,13 +22,13 @@ data_path = 'data/'
 
 # 1. Original Data
 train_loader = torch.load(os.path.join(data_path,'train_loader.pkl'))
-val_dataloader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
-test_dataloader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
+val_loader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
+test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
 
 # 2. SMOTE Data
-train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
-val_dataloader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
-test_dataloader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
+smote_train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
+smote_val_loader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
+smote_test_loader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
 
 print("[INFO] All data succesfully loaded!")
 
