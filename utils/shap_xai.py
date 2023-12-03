@@ -1,4 +1,7 @@
 from torchvision import models
+from helper import replace_afs
+import custom_afs as custom_afs
+
 import os
 import numpy as np
 import torch
@@ -8,8 +11,8 @@ import shap
 def shap_explainable_ai(model, data_loader, device):
     batch = next(iter(data_loader))
     images, _ = batch
-    background = images[:50].to(device)
-    test_images = images[50:65].to(device)
+    background = images[:3].to(device)
+    test_images = images[3:5].to(device)
     e = shap.DeepExplainer(model, background)
     shap_values = e.shap_values(test_images)
 
@@ -19,7 +22,9 @@ def shap_explainable_ai(model, data_loader, device):
     
 if __name__ == '__main__':
     # 1. Load model to make predictions
-    best_model_path = "assets/weights/custom_layer_original/densenet/SmallNeg_0.3_DenseNet201.pt"
+    model_weights = "SmallNeg_0.3_DenseNet201.pt"
+    best_model_path = f"assets/weights/custom_layer_original/densenet/{model_weights}"
+
     model = models.densenet201()
     model.classifier = nn.Sequential(
                                   nn.Linear(model.classifier.in_features, 64),
@@ -29,9 +34,13 @@ if __name__ == '__main__':
                              )
     
     model.load_state_dict(torch.load(best_model_path))
-    model.to("cpu")
+    model.to("cuda")
+    
+    replace_afs(module = model, func = custom_afs.Small_Neg(0.3))
 
+    print(model)
+    
     # 2. Load dataloader and feed to shap_xai func to see interpretable & explainable of AI
     data_path = 'data/'
     test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
-    shap_explainable_ai(model, test_loader, "cpu")
+    shap_explainable_ai(model, test_loader, "cuda")
