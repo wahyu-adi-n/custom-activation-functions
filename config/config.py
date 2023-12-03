@@ -39,4 +39,4 @@ patience = 5
 classes = ['normal', 'pneumonia']
 class_index = {0: 'NORMAL', 1: 'PNEUMONIA'}
 num_classes = len(classes)
-model_name = "DenseNet201" # "ResNet152v2", "VGG19"
+model_name =  "DenseNet201" # "ResNet152v2"

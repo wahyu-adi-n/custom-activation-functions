@@ -17,25 +17,9 @@ import os
 # Data loaders preparation
 data_path = 'data/'
 
-# 1. Original Data
-train_loader = torch.load(os.path.join(data_path,'train_loader.pkl'))
-val_loader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
-test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
-
-# 2. SMOTE Data
-# smote_train_loader = torch.load(os.path.join(data_path,'train_loader_smote.pkl'))
-# smote_val_loader = torch.load(os.path.join(data_path, 'val_loader_smote.pkl'))
-# smote_test_loader = torch.load(os.path.join(data_path, 'test_loader_smote.pkl'))
-
-# 3. CLAHE Data
-# clahe_train_loader = torch.load(os.path.join(data_path,'clahe_train_loader.pkl'))
-# clahe_val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader.pkl'))
-# clahe_test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader.pkl'))
-
-# # 4. CLAHE + SMOTE Data
-# clahe_smote_train_loader = torch.load(os.path.join(data_path,'clahe_train_loader_smote.pkl'))
-# clahe_smote_val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader_smote.pkl'))
-# clahe_smote_test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader_smote.pkl'))
+train_loader = torch.load(os.path.join(data_path,'clahe_train_loader.pkl'))
+val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader.pkl'))
+test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader.pkl'))
 
 for X, y in train_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
@@ -47,6 +31,9 @@ for X, y in train_loader:
 print(f"Device Type: {device} device.")
 print(f"Epochs: {epochs} epochs.")
 print(f"Num Classes: {num_classes}")
+
+# Class Weighting
+# cls_weight = weighted_class(device)
 
 with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
     csv_file_writer = csv.writer(csv_file)
@@ -72,7 +59,7 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
             for parameter in model.parameters():
                 parameter.requires_grad = False
 
-            model.classifier = nn.Linear(1920, num_classes)
+            # model.classifier = nn.Linear(1920, num_classes)
             
         elif model_name == "ResNet152v2":
             # 2. ResNet152v2
@@ -93,12 +80,12 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
             model.classifier[6] = nn.Linear(4096, num_classes)
     
         # Add custom layers (future works)
-        # model.classifier = nn.Sequential(
-        #                           nn.Linear(model.classifier.in_features, 64),
-        #                           nn.Linear(64, 32),
-        #                           nn.Dropout(0.2),
-        #                           nn.Linear(32, num_classes)
-        #                      )
+        model.classifier = nn.Sequential(
+                                  nn.Linear(model.classifier.in_features, 64),
+                                  nn.Linear(64, 32),
+                                  nn.Dropout(0.2),
+                                  nn.Linear(32, num_classes)
+                             )
             
         model.to(device)
 

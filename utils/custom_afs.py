@@ -3,6 +3,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch import nn
 
+def relu(x):
+    t_zero = x.new([0.0])
+    x = torch.where(x<t_zero[0], t_zero[0], x)
+    
+    return x
+
+class ReLU(nn.Module):
+    def __init__(self):
+        super().__init__()  #init the base class
+
+    def forward(self, input):
+        return relu(input)
+
 # I had initially include an argument for each function to have it operate in place but it didn't work properly for some so I just removed that
 # if input negative, output = input, else output = 0 (i.e. for positives)
 def neg_relu(x):
@@ -416,6 +429,7 @@ class Val_Hill(nn.Module):
         return val_hill(input, self.start_p, self.val_p, self.peak_p, self.end_p)
 
 act_func_dict = {
+                    "relu" : relu,
                     "neg_relu" : neg_relu, 
                     "dslope_relu" : dslope_relu, 
                     "diff_y_relu" : diff_y_relu, 
@@ -428,6 +442,7 @@ act_func_dict = {
                 }
 
 act_class_dict = {  
+                    "ReLU": ReLU(),
                     "NegReLU": NegReLU(), 
                     "DSlopeReLU": DSlopeReLU(), 
                     "Diff_Y_ReLU": Diff_Y_ReLU(), 
