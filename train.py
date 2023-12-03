@@ -1,7 +1,7 @@
 from torch import nn
 from torchvision import models
 from config.config import *
-from utils.helper import *
+from utils.helper import replace_afs, evaluate_model, training_step, get_probs_and_preds
 from sklearn.metrics import classification_report, confusion_matrix
 from tqdm import tqdm
 
@@ -17,9 +17,9 @@ import os
 # Data loaders preparation
 data_path = 'data/'
 
-train_loader = torch.load(os.path.join(data_path,'clahe_train_loader.pkl'))
-val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader.pkl'))
-test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader.pkl'))
+train_loader = torch.load(os.path.join(data_path,'train_loader.pkl'))
+val_loader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
+test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
 
 for X, y in train_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")

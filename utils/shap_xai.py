@@ -8,10 +8,8 @@ import shap
 def shap_explainable_ai(model, data_loader, device):
     batch = next(iter(data_loader))
     images, _ = batch
-
-    background = images[:100].to(device)
-    test_images = images[100:105].to(device)
-    
+    background = images[:50].to(device)
+    test_images = images[50:65].to(device)
     e = shap.DeepExplainer(model, background)
     shap_values = e.shap_values(test_images)
 
