@@ -52,7 +52,7 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
         # Define model
         # Using pre-trained models
         
-        if model_name == "DenseNet201":
+        if model_name == "DenseNet20 1":
             # 1. DenseNet201
             model = models.densenet201(weights=models.DenseNet201_Weights.IMAGENET1K_V1)
 
