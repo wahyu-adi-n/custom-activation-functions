@@ -23,7 +23,7 @@ def data_prep():
                                 transforms.CenterCrop(224),
                                 transforms.RandomHorizontalFlip(),
                                 transforms.RandomRotation(10),
-                                transforms.RandomGrayscale(),
+                                # transforms.RandomGrayscale(),
                                 transforms.ToTensor(),
                             ])
 

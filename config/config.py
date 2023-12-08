@@ -3,20 +3,20 @@ import torch.nn as nn
 import torch
 
 afs_dict = {
-                'ReLU' : nn.ReLU(),
-                'NegReLU' : custom_afs.NegReLU(),
-                'Dslope_0.25' : custom_afs.DSlopeReLU(0.25),
-                # 'Dslope_0.75' : custom_afs.DSlopeReLU(0.75),
+                # 'ReLU' : nn.ReLU(),
+                # 'NegReLU' : custom_afs.NegReLU(),
+                # # 'Dslope_0.25' : custom_afs.DSlopeReLU(0.25),
+                # # 'Dslope_0.75' : custom_afs.DSlopeReLU(0.75),
                 'Dslope_1.25' : custom_afs.DSlopeReLU(1.25),
-                'DiffYRelu_0.5' : custom_afs.Diff_Y_ReLU(0.5),
-                'DiffYRelu_1.0' : custom_afs.Diff_Y_ReLU(1.0),
-                'SmallNeg_0.1' : custom_afs.Small_Neg(0.1),
-                # 'SmallNeg_0.2' : custom_afs.Small_Neg(0.2),
-                'SmallNeg_0.3' : custom_afs.Small_Neg(0.3),
+                # 'DiffYRelu_0.5' : custom_afs.Diff_Y_ReLU(0.5),
+                # # 'DiffYRelu_1.0' : custom_afs.Diff_Y_ReLU(1.0),
+                # # 'SmallNeg_0.1' : custom_afs.Small_Neg(0.1),
+                # # 'SmallNeg_0.2' : custom_afs.Small_Neg(0.2),
+                # 'SmallNeg_0.3' : custom_afs.Small_Neg(0.3),
                 # 'SmallNeg_0.4' : custom_afs.Small_Neg(0.4),
-                'SmallNeg_0.5' : custom_afs.Small_Neg(0.5),
-                'PosHill_0.25' : custom_afs.Pos_Hill_V1(0.25),
-                'PosHill_0.5' : custom_afs.Pos_Hill_V1(0.5),
+                # 'SmallNeg_0.5' : custom_afs.Small_Neg(0.5),
+                # 'PosHill_0.25' : custom_afs.Pos_Hill_V1(0.25),
+                # 'PosHill_0.5' : custom_afs.Pos_Hill_V1(0.5),
                 # 'PosHill_0.75' : custom_afs.Pos_Hill_V1(0.75),
                 # 'Pos_Hill_V2' : custom_afs.Pos_Hill_V2((-1,0), (0,1), (1,0)),
                 # 'Pos_Hill_V2_s' : custom_afs.Pos_Hill_V2((-0.5,0),(0,1.25),(0.5,0)),
@@ -40,3 +40,6 @@ classes = ['normal', 'pneumonia']
 class_index = {0: 'NORMAL', 1: 'PNEUMONIA'}
 num_classes = len(classes)
 model_name =  "DenseNet201" # "ResNet152v2"
+
+ALPHA = 0.8
+GAMMA = 2

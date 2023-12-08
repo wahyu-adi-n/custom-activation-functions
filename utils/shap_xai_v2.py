@@ -19,6 +19,7 @@ data_path = 'data/'
 train_data = torch.load(os.path.join(data_path,'clahe_train_data.pkl'))
 val_data = torch.load(os.path.join(data_path, 'clahe_val_data.pkl'))
 test_data = torch.load(os.path.join(data_path, 'clahe_test_data.pkl'))
+train_loader = torch.load(os.path.join(data_path, 'train_loader.pkl'))
 
 test_data_transform = transforms.Compose([
                                 transforms.Resize((256, 256)),
@@ -34,30 +35,46 @@ model.classifier = nn.Sequential(nn.Linear(model.classifier.in_features, 64),
     
 model.load_state_dict(torch.load(best_model_path))
 
-replace_afs(module = model, func = custom_afs.DSlopeReLU(1.25))
+# replace_afs(module = model, func = custom_afs.DSlopeReLU(1.25))
 
 # Use CPU
 device = torch.device('cuda')
 model = model.to(device)
 
-#Load 100 images for background
-shap_loader = DataLoader(train_data, batch_size=100, shuffle=True)
-background, _ = next(iter(shap_loader))
-background = background.to(device)
+# print(test_loader)
+batch = next(iter(train_loader))
+images, labels = batch
+background = images[:61].to(device)
+test_images = images[61:65].to(device)
+print(test_images)
 
-#Create SHAP explainer 
-explainer = shap.DeepExplainer(model, background)
+e = shap.DeepExplainer(model, background)
+shap_values = e.shap_values(test_images)
 
-# Load test images
-test_loader = DataLoader(test_data, batch_size=5, shuffle=False)
-test_input, _ = next(iter(test_loader))
-test_input = test_input.to(device)
+shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
+test_numpy = np.swapaxes(np.swapaxes(test_images.cpu().numpy(), 1, -1), 1, 2)
+shap.image_plot(shap_numpy, -test_numpy)
 
-# Get SHAP values
-shap_values = explainer.shap_values(test_input)
 
-# Reshape shap values and images for plotting
-shap_numpy = list(np.array(shap_values).transpose(0,1,3,4,2))
-test_numpy = np.array([np.array(img) for img in test_loader])
 
-shap.image_plot(shap_numpy, test_numpy,show=False)
+# #Load 100 images for background
+# shap_loader = DataLoader(train_data, batch_size=100, shuffle=True)
+# background, _ = next(iter(shap_loader))
+# background = background.to(device)
+
+# #Create SHAP explainer 
+# explainer = shap.DeepExplainer(model, background)
+
+# # Load test images
+# test_loader = DataLoader(test_data, batch_size=5, shuffle=False)
+# test_input, _ = next(iter(test_loader))
+# test_input = test_input.to(device)
+
+# # Get SHAP values
+# shap_values = explainer.shap_values(test_input)
+
+# # Reshape shap values and images for plotting
+# shap_numpy = list(np.array(shap_values).transpose(0,1,3,4,2))
+# test_numpy = np.array([np.array(img) for img in test_loader])
+
+# shap.image_plot(shap_numpy, test_numpy,show=False)

@@ -15,12 +15,13 @@ import numpy as np
 import seaborn as sns
 import os
 
-# Data loaders preparation
 data_path = 'data/'
 
-train_loader = torch.load(os.path.join(data_path, 'train_loader.pkl'))
-val_loader = torch.load(os.path.join(data_path, 'val_loader.pkl'))
-test_loader = torch.load(os.path.join(data_path, 'test_loader.pkl'))
+train_loader = torch.load(os.path.join(data_path, 'clahe_train_loader.pkl'))
+val_loader = torch.load(os.path.join(data_path, 'clahe_val_loader.pkl'))
+test_loader = torch.load(os.path.join(data_path, 'clahe_test_loader.pkl'))
+
+best_model_path_to_fine_tune = "assets/weights/custom_layer_clahe/densenet/Dslope_1.25_DenseNet201.pt"
 
 for X, y in train_loader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
@@ -52,13 +53,12 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
         
         # Define model
         # Using pre-trained models
-        
         if model_name == "DenseNet201":
             # 1. DenseNet201
             model = models.densenet201(weights=models.DenseNet201_Weights.IMAGENET1K_V1)
-
-            for parameter in model.parameters():
-                parameter.requires_grad = False
+            
+            # for parameter in model.parameters():
+            #     parameter.requires_grad = False
 
             # model.classifier = nn.Linear(1920, num_classes)
             
@@ -87,24 +87,24 @@ with open(f"assets/logs/{model_name}_results.csv", mode="w") as csv_file:
                                   nn.Dropout(0.2),
                                   nn.Linear(32, num_classes)
                              )
-            
-        model.to(device)
 
-        # model = NeuralNetwork().to(device)
-        # model = ResNet(ResidualBlock, [3,1,2,4]).to(device)
-        # model = ResNet(ResidualBlock, [3,4,6,3]).to(device)
-
-        # print("Before:\n", model)
+        print("Before:\n", model)
 
         # Replace afs in hidden layers
         replace_afs(module = model, func = func)  
 
-        # print("\nAfter replace AFs:\n", model)
+        print("\nAfter replace AFs:\n", model)
+        
+        model.load_state_dict(torch.load(best_model_path_to_fine_tune))
+        model.to(device)
+        
+        for parameter in model.parameters():
+            parameter.requires_grad = True
 
         # Optimizing the model parameters
         loss_function = nn.CrossEntropyLoss()
         # loss_function = CEFLLoss(gamma=GAMMA)
-        optimizer = torch.optim.Adam(model.classifier.parameters() if model_name != "ResNet152v2" else model.fc.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.classifier.parameters() if model_name != "ResNet152v2" else model.fc.parameters(), lr=0.001*0.1)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
         
         # Monitor 'val_loss'
